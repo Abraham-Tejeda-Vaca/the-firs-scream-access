@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#09070d" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="TFS Access" />
+  <title>THE FIRS SCREAM · Access</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">CONTROL DE ACCESO</div>
+        <h1 id="headerEventName">THE FIRS SCREAM</h1>
+      </div>
+      <div id="connectionBadge" class="connection-badge"><span class="dot"></span><span>Revisando</span></div>
+    </header>
+
+    <main class="main-content">
+      <section class="page active" data-page="home">
+        <div class="hero-card">
+          <div>
+            <div class="eyebrow">EVENTO</div>
+            <h2 id="homeEventName">THE FIRS SCREAM</h2>
+            <p id="homeEventDate" class="muted">23 de octubre de 2026</p>
+          </div>
+          <button class="primary big" data-nav="scan">Escanear boleto</button>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card"><span>Vendidos</span><strong id="statSold">0</strong></article>
+          <article class="stat-card success"><span>Ingresaron</span><strong id="statUsed">0</strong></article>
+          <article class="stat-card"><span>Pendientes</span><strong id="statPending">0</strong></article>
+          <article class="stat-card"><span>Ingreso registrado</span><strong id="statRevenue">$0</strong></article>
+        </div>
+
+        <div class="section-head">
+          <div><div class="eyebrow">ÚLTIMOS ACCESOS</div><h3>Actividad reciente</h3></div>
+          <button id="undoLastBtn" class="ghost small" disabled>Deshacer último</button>
+        </div>
+        <div id="recentList" class="list-stack empty-state">Todavía no hay accesos registrados.</div>
+      </section>
+
+      <section class="page" data-page="scan">
+        <div class="section-head">
+          <div><div class="eyebrow">PUERTA</div><h2>Escáner de acceso</h2></div>
+          <span class="pill">1 dispositivo</span>
+        </div>
+
+        <div id="scannerCard" class="scanner-card">
+          <div id="reader" class="reader"></div>
+          <div id="scannerPlaceholder" class="scanner-placeholder">
+            <div class="scanner-icon">▦</div>
+            <strong>Cámara detenida</strong>
+            <span>Inicia el escáner para validar boletos.</span>
+          </div>
+          <div class="scanner-actions">
+            <button id="startScannerBtn" class="primary">Iniciar cámara</button>
+            <button id="stopScannerBtn" class="secondary" disabled>Detener</button>
+          </div>
+        </div>
+
+        <div id="scanResult" class="scan-result neutral">
+          <div class="scan-result-icon">—</div>
+          <div><strong>Listo para escanear</strong><p>Los boletos válidos se registran automáticamente.</p></div>
+        </div>
+
+        <div class="panel">
+          <div class="eyebrow">RESPALDO MANUAL</div>
+          <h3>Buscar por folio</h3>
+          <div class="inline-form">
+            <input id="manualCode" autocomplete="off" autocapitalize="characters" placeholder="TFS-7K4M2-9QX8P" />
+            <button id="manualCheckBtn" class="secondary">Validar</button>
+          </div>
+          <p class="help">Úsalo si la cámara falla o el brillo de la pantalla dificulta leer el QR.</p>
+        </div>
+      </section>
+
+      <section class="page" data-page="tickets">
+        <div class="section-head">
+          <div><div class="eyebrow">BASE LOCAL</div><h2>Boletos</h2></div>
+          <button class="primary small" data-nav="new">+ Nuevo</button>
+        </div>
+        <div class="filters">
+          <input id="ticketSearch" type="search" placeholder="Buscar nombre o folio" />
+          <select id="ticketFilter">
+            <option value="all">Todos</option>
+            <option value="pending">Pendientes</option>
+            <option value="used">Ingresaron</option>
+            <option value="cancelled">Cancelados</option>
+          </select>
+        </div>
+        <div id="ticketsList" class="list-stack empty-state">Aún no has creado boletos.</div>
+      </section>
+
+      <section class="page" data-page="new">
+        <div class="section-head">
+          <div><div class="eyebrow">PREVENTA DIGITAL</div><h2>Generar boleto</h2></div>
+        </div>
+        <form id="newTicketForm" class="panel form-grid">
+          <label>Nombre del comprador <span class="optional">opcional</span>
+            <input id="buyerName" maxlength="80" placeholder="Ej. Andrea Hernández" />
+          </label>
+          <label>Tipo de acceso
+            <select id="ticketPhase"></select>
+          </label>
+          <label>Cantidad
+            <input id="ticketQuantity" type="number" min="1" max="25" value="1" />
+          </label>
+          <label>Nota <span class="optional">opcional</span>
+            <input id="ticketNote" maxlength="120" placeholder="Ej. Pagó por transferencia" />
+          </label>
+          <div class="price-preview"><span>Precio por boleto</span><strong id="pricePreview">$0</strong></div>
+          <button class="primary big" type="submit">Generar boleto seguro</button>
+        </form>
+
+        <div id="generatedSection" class="generated-section hidden">
+          <div class="section-head"><div><div class="eyebrow">LISTOS PARA ENVIAR</div><h3>Boletos generados</h3></div></div>
+          <div id="generatedTickets" class="ticket-grid"></div>
+        </div>
+      </section>
+
+      <section class="page" data-page="settings">
+        <div class="section-head"><div><div class="eyebrow">ADMINISTRACIÓN</div><h2>Configuración</h2></div></div>
+        <form id="settingsForm" class="panel form-grid">
+          <label>Nombre del evento
+            <input id="settingsEventName" maxlength="60" />
+          </label>
+          <label>Fecha y hora
+            <input id="settingsEventDate" type="datetime-local" />
+          </label>
+          <div class="eyebrow full">FASES Y PRECIOS</div>
+          <div id="phasesEditor" class="phase-editor full"></div>
+          <button class="primary" type="submit">Guardar configuración</button>
+        </form>
+
+        <div class="panel">
+          <div class="eyebrow">RESPALDO</div>
+          <h3>Protege tu base antes de la fiesta</h3>
+          <p class="help">El respaldo incluye boletos, estados y la clave criptográfica necesaria para validar tus QR.</p>
+          <div class="button-row">
+            <button id="exportBtn" class="secondary">Exportar respaldo</button>
+            <label class="secondary file-label">Importar respaldo<input id="importInput" type="file" accept="application/json,.json" hidden /></label>
+          </div>
+        </div>
+
+        <div class="panel danger-panel">
+          <div class="eyebrow">ZONA DE RIESGO</div>
+          <h3>Eliminar todos los datos</h3>
+          <p class="help">Borra boletos y accesos de este dispositivo. Exporta un respaldo antes.</p>
+          <button id="wipeBtn" class="danger">Borrar base local</button>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Navegación principal">
+      <button class="nav-item active" data-nav="home"><span>⌂</span><small>Inicio</small></button>
+      <button class="nav-item" data-nav="scan"><span>▦</span><small>Escanear</small></button>
+      <button class="nav-item" data-nav="tickets"><span>☷</span><small>Boletos</small></button>
+      <button class="nav-item" data-nav="new"><span>＋</span><small>Nuevo</small></button>
+      <button class="nav-item" data-nav="settings"><span>⚙</span><small>Ajustes</small></button>
+    </nav>
+  </div>
+
+  <dialog id="ticketDialog" class="modal">
+    <div id="ticketDialogContent"></div>
+    <button id="closeDialogBtn" class="ghost full-width">Cerrar</button>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <canvas id="workCanvas" class="hidden"></canvas>
+  <div id="qrWork" class="qr-work" aria-hidden="true"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
